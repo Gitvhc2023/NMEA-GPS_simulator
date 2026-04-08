@@ -1,6 +1,43 @@
 class NMEA {
     constructor() {}
 
+    satellites() {
+        return [
+            { prn: 1, elev: 45, az: 100, snr: 40 },
+            { prn: 3, elev: 30, az: 200, snr: 35 },
+            { prn: 5, elev: 60, az: 300, snr: 50 },
+            { prn: 7, elev: 20, az: 50, snr: 20 }
+        ];
+    }
+    generateSatellites(state) {
+        const count = state.satellites || 8;
+        const prns = state.prns || [];
+
+        let sats = [];
+
+        for (let i = 0; i < count; i++) {
+
+            const prn = prns[i] || Math.floor(Math.random() * 32) + 1;
+
+            const elev = Math.floor(Math.random() * 90);
+
+            const az = Math.floor(Math.random() * 360);
+
+            // SNR más realista (depende de elevación)
+            let snr = Math.floor(20 + (elev / 90) * 30);
+
+            sats.push({ prn, elev, az, snr });
+        }
+
+        return sats;
+    }
+    selectFixSatellites(sats) {
+        // ordenar por mejor señal (SNR)
+        const sorted = [...sats].sort((a, b) => b.snr - a.snr);
+
+        // tomar los mejores 4–12
+        return sorted.slice(0, 6); // típico GPS usa 4-8
+    }
     // ---------------- CHECKSUM ----------------
     checksum(sentence) {
         let cs = 0;
@@ -57,12 +94,21 @@ class NMEA {
 
     // ---------------- GSA ----------------
     GSA(state) {
+        const sats = !state.moving ? this.satellites() : this.generateSatellites(state);
+
+        const fixSats = this.selectFixSatellites(sats);
+
         let str = `$GPGSA,${state.mode || 'A'},${state.fixType || 3},`;
 
         const prns = state.prns || [1,2,3,4,5,6];
 
         for (let i = 0; i < 12; i++) {
-            str += (prns[i] ? String(prns[i]).padStart(2, '0') : '') + ",";
+            /* str += (prns[i] ? String(prns[i]).padStart(2, '0') : '') + ","; */
+            if (fixSats[i]) {
+                str += `${String(fixSats[i].prn).padStart(2, '0')},`;
+            } else {
+                str += ",";
+            }
         }
 
         str += `${state.pdop || 1.0},`;
@@ -97,22 +143,31 @@ class NMEA {
 
     // ---------------- GSV ----------------
     GSV(state) {
-        const sats = state.satellitesInfo || [
-            { prn: 1, elev: 45, az: 100, snr: 40 },
-            { prn: 3, elev: 30, az: 200, snr: 35 },
-            { prn: 5, elev: 60, az: 300, snr: 50 },
-            { prn: 7, elev: 20, az: 50, snr: 20 }
-        ];
+    
+        const sats = !state.moving ? this.satellites() : this.generateSatellites(state);
 
-        let str = `$GPGSV,1,1,${sats.length}`;
+        const totalSats = sats.length;
+        const perMessage = 4;
+        const totalMsgs = Math.ceil(totalSats / perMessage);
 
-        sats.forEach(s => {
-            str += `,${s.prn},${s.elev},${s.az},${s.snr}`;
-        });
+        let messages = [];
 
-        str += `*${this.checksum(str)}`;
+        for (let i = 0; i < totalMsgs; i++) {
+            let str = `$GPGSV,${totalMsgs},${i + 1},${totalSats}`;
 
-        return str;
+            const chunk = sats.slice(i * perMessage, (i + 1) * perMessage);
+
+            chunk.forEach(s => {
+                str += `,${String(s.prn).padStart(2, '0')}`;
+                str += `,${String(s.elev).padStart(2, '0')}`;
+                str += `,${String(s.az).padStart(3, '0')}`;
+                str += `,${String(s.snr).padStart(2, '0')}`;
+            });
+
+            str += `*${this.checksum(str)}`;
+            return str
+            messages.push(str);
+        }
     }
 
     // ---------------- ENCODER GENERAL ----------------

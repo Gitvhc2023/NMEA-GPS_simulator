@@ -8,7 +8,9 @@ export const gpsState = reactive({
     heading: 0,
     fix: 1,
     satellites: 6,
+    seenSatellites:[],
     hdop: 0.5,
     moving: false,
+    log:true,
     date: new Date()
 })

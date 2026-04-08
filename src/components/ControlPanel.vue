@@ -254,7 +254,7 @@
         }
     })
 </script>
-<style>
+<style scoped>
 .panel {
   height: 100%;
   background: #111827;
@@ -262,37 +262,37 @@
   padding: 10px;
 }
 
-.title {
+:deep(.title) {
   color: #22c55e;
 }
 
-.section {
+:deep(.section) {
   margin-top: 20px;
 }
-.row-container {
+:deep(.row-container) {
     margin-top: -20px;
 }
-.gps-input {
+:deep(.gps-input) {
   width: 140px;
 
 }
-.label-error .v-label {
+:deep(.label-error .v-label) {
   color: #ff5252 !important;
 }
 
-.label-warning .v-label {
+:deep(.label-warning .v-label) {
   color: #fb8c00 !important;
 }
 
-.label-success .v-label {
+:deep(.label-success .v-label) {
   color: #4caf50 !important;
 }
 
-.gps-input .v-field {
+:deep(.gps-input .v-field) {
   height: 38px !important;
 }
 
-.gps-input .v-field__input {
+:deep(.gps-input .v-field__input) {
   min-height: 38px !important;
   padding: 0 8px;
 }

@@ -91,11 +91,7 @@ export default {
 </script>
 
 <style scoped>
-/* .spinner-controls {
-  display: flex;
-  flex-direction: column;
-  margin-right: -8px;
-} */
+
 :deep(.spinner-controls) {
   display: flex;
   flex-direction: column;
@@ -115,7 +111,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.spinner-controls .v-btn:first-child {
+:deep(.spinner-controls .v-btn:first-child) {
   border-bottom: 1px solid rgba(0,0,0,0.2);
 } 
 </style>

@@ -127,7 +127,7 @@ watch(() => [gpsState.lat, gpsState.lon], () => {
 })
 </script>
 
-<style>
+<style scoped>
 .map-card {
   height: 75vh;
 }
