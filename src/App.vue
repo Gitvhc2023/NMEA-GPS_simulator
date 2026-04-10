@@ -3,6 +3,55 @@
   import ControlPanel from './components/ControlPanel.vue';
   import NMEAConsole from './components/NMEAConsole.vue';
   import signalStrength from './components/signalStrength.vue';
+  import { ref,inject } from 'vue'
+  import { gpsState } from './store/gpsStore';
+  import { plotsGPS } from './services/parserService';
+  import IMEX from './services/IMEX';
+  import snackbar from './components/snackbar.vue';
+  
+  const viewLog = ref(false)
+  /* const { toast } = inject('snackbar') */
+  const viewSnackbar = inject('snackbar')
+  function seeLog() {
+        viewLog.value = !viewLog.value
+        viewLog.value ? !gpsState.log : gpsState.log
+        gpsState.log = viewLog.value
+        console.log("mostra taps",viewLog.value)
+  }
+  async function importLog(params) {
+    try {
+          var result = await IMEX.import("log", ".log");
+    } catch (error) {
+        console.log(error)
+    }
+    if(result.name.indexOf("nmea.log") > -1){
+        var lineas = result.data.split('\n');
+        lineas.pop()
+        var count = 0;
+        let datanmea = {}
+        for(var linea of lineas) {
+          count++;
+          
+          if(""!=linea) datanmea = plotsGPS(linea)
+          if (lineas.length==count) {
+            console.log("frame-count",count)
+            /* this.$emit("frame-count",count); */
+          }
+          if(!datanmea) continue
+          console.log("llenar..",datanmea)
+          /* this.uploadFile = Object.assign({},datanmea) */
+        }
+
+      }else{
+        console.log('espefique el archivo, debe ser nmea.log')
+        viewSnackbar.toast("spefique el archivo, debe ser nmea.log","error")
+        
+      }
+
+
+    
+  }
+
 </script>
 
 <template>
@@ -11,9 +60,17 @@
       <v-toolbar-title text="Toolbar"></v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-slot:append>
-        <v-btn icon="mdi-magnify"></v-btn>
+        <v-tooltip location="bottom" :text="viewLog ? 'View satellites visibles':'View raw GPS NMEA sentences'">
+          <template v-slot:activator="{ props }">
+            
+            <v-btn v-bind="props" @click="seeLog" icon >
+              <v-icon small > {{viewLog ? 'mdi-console-line' : 'mdi-chart-bar'}} </v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+        
 
-        <v-btn icon="mdi-heart"></v-btn>
+        <v-btn @click="importLog" icon="mdi-file-import-outline"></v-btn>
 
         <v-btn icon="mdi-dots-vertical"></v-btn>
       </template>
@@ -29,10 +86,9 @@
 
       <div class="console">
         <NMEAConsole />
-        <!-- <signalStrength /> -->
       </div>
     </div> 
-
+    <snackbar />
     </v-card>
   
     

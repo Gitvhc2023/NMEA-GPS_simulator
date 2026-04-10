@@ -94,7 +94,7 @@ class NMEA {
 
     // ---------------- GSA ----------------
     GSA(state) {
-        const sats = !state.moving ? this.satellites() : this.generateSatellites(state);
+        const sats = this.generateSatellites(state);
 
         const fixSats = this.selectFixSatellites(sats);
 
@@ -144,7 +144,7 @@ class NMEA {
     // ---------------- GSV ----------------
     GSV(state) {
     
-        const sats = !state.moving ? this.satellites() : this.generateSatellites(state);
+        const sats = this.generateSatellites(state);
 
         const totalSats = sats.length;
         const perMessage = 4;

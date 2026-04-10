@@ -4,6 +4,7 @@
         max-width="350"
         >
         <v-card-text>
+            
             <v-row no-gutters >
                 <v-col cols="12" class="text-left mb-3 mt-n2">
                     <v-btn variant="flat" block style="height: 30px;" small  spaced="end"  @click="toggle" >{{'Simulation'}}
@@ -12,6 +13,7 @@
                     </v-btn>
                 </v-col>
             </v-row>
+            <SerialView />
             <v-row no-gutters >
                 <v-col cols="4" class="text-left" @click="parseTime">{{ ("UTC Time") }}:</v-col>
                 <v-col cols="8" class="text-center" >
@@ -169,6 +171,7 @@
     import { useGPS } from '../control/controlGPS'
     import DiluciónPrecisiónInput from './diluciónPrecisiónInput.vue'
     import coordinates from './coordinates.vue'
+    import SerialView from './SerialView.vue'
 
 
     const { state, start, stop } = useGPS()

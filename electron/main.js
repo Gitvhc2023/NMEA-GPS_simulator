@@ -1,8 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const { initSerial, sendNMEA } = require('./ipc/serial')
-
+let mainWindow
 function createWindow() {
-    const win = new BrowserWindow({
+    const mainWindow = new BrowserWindow({
         width: 1300,
         height: 800,
         webPreferences: {
@@ -10,7 +10,8 @@ function createWindow() {
         }
     })
 
-    win.loadURL('http://localhost:5173')
+    mainWindow.loadURL('http://localhost:5173')
+    mainWindow.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {

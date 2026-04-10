@@ -8,13 +8,21 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, onMounted, watch } from 'vue'
     import { generateFrames } from '../services/nmeaService'
     import { gpsState } from '../store/gpsStore'
     import signalStrength1 from './signalStrength1.vue'
 
     const logs = ref('')
-   
+    let logInterval = null
+    function createLog(){
+        const dataFrame = generateFrames(gpsState)
+        logs.value = Object.values(dataFrame).join('\n')
+        if(dataFrame.gsv){
+            gpsState.seenSatellites = parseGSV(dataFrame.gsv)
+        }
+
+    }
     function parseGSV(sentence) {
         const parts = sentence.split(',')
 
@@ -30,13 +38,26 @@
         }
         return sats
     }
-    setInterval(() => {
-        const data = generateFrames(gpsState)
-        logs.value = Object.values(data).join('\n')
-        if(data.gsv){
-            gpsState.seenSatellites = parseGSV(data.gsv)
+    
+    watch(() => gpsState.moving, (val) => {
+        console.log("moving",val)
+        if(val==true){
+            logInterval = setInterval(() => {
+                const data = generateFrames(gpsState)
+                gpsState.seenSatellites = parseGSV(data?.gsv)
+                logs.value = Object.values(data).join('\n')
+            }, 1000)
+
+        }else{
+            createLog()
+            clearInterval(logInterval)
         }
-    }, 1000)
+        
+    })
+    onMounted(() => {
+        createLog()
+    })
+    
 </script>
 <style >
 .console-log {
