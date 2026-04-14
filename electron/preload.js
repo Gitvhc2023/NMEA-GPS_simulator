@@ -1,15 +1,21 @@
 const { contextBridge, ipcRenderer } = require('electron')
-//process.env.isElectron
+
 contextBridge.exposeInMainWorld('electronAPI', {
-    // 📤 Enviar datos al main
     sendNMEA: (data) => ipcRenderer.send('nmea:data', data),
 
-    // 📥 Recibir datos del main (serial, logs, etc)
     onSerialData: (callback) => {
-        ipcRenderer.on('serial:data', (_, data) => {
-            callback(data)
-        })
+        ipcRenderer.on('serial:data', (_, data) => callback(data))
     },
-    // 🔥 NUEVO: obtener puertos
-    listSerialPorts: () => ipcRenderer.invoke('serial:list')
+
+    listSerialPorts: () => ipcRenderer.invoke('serial:list'),
+    openSerial: (path) => ipcRenderer.invoke('serial:open', path),
+    closeSerial: () => ipcRenderer.invoke('serial:close'),
+
+    getSerialStatus: () => ipcRenderer.invoke('serial:status'),
+
+    onSerialStatus: (callback) => {
+        ipcRenderer.on('serial:status', (_, status) => callback(status))
+        ipcRenderer.on('serial:error', (_, status) => callback(status))
+    },
+    exitApp: () => ipcRenderer.invoke('exit-app'),
 })

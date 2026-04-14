@@ -4,7 +4,14 @@
         max-width="350"
         >
         <v-card-text>
-            
+            <!-- <SerialView v-if="isElectron" class="gps-input"  /> -->
+            <v-row no-gutters v-if="isElectron">
+                 <v-col cols="3">Devices</v-col>
+                <v-col cols="9">
+                     <SerialView class="gps-input"  />
+                </v-col>
+
+            </v-row>
             <v-row no-gutters >
                 <v-col cols="12" class="text-left mb-3 mt-n2">
                     <v-btn variant="flat" block style="height: 30px;" small  spaced="end"  @click="toggle" >{{'Simulation'}}
@@ -13,7 +20,6 @@
                     </v-btn>
                 </v-col>
             </v-row>
-            <SerialView />
             <v-row no-gutters >
                 <v-col cols="4" class="text-left" @click="parseTime">{{ ("UTC Time") }}:</v-col>
                 <v-col cols="8" class="text-center" >
@@ -177,7 +183,7 @@
     const { state, start, stop } = useGPS()
     const hdopInput = ref('0.5')
     const moving = ref(false)
-
+    const isElectron = ref(false)
     const selectQty = shallowRef({ value:1,info:'GPS fix (SPS)'})
     const fixQty = [
           {value:0,info:'Fix not available'},
@@ -255,6 +261,9 @@
             default:
                 return { color: 'grey' }
         }
+    })
+    onMounted(() => {
+        isElectron.value = !!window.electronAPI
     })
 </script>
 <style scoped>
