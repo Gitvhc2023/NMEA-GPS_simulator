@@ -2,15 +2,21 @@
     <v-card 
         class="mx-auto"
         max-width="350"
+        flat
         >
         <v-card-text>
-            <!-- <SerialView v-if="isElectron" class="gps-input"  /> -->
             <v-row no-gutters v-if="isElectron">
                  <v-col cols="3">Devices</v-col>
                 <v-col cols="9">
                      <SerialView class="gps-input"  />
                 </v-col>
 
+            </v-row>
+            <v-row no-gutters v-if="!isElectron">
+                 <v-col cols="3">Devices</v-col>
+                <v-col cols="9">
+                     <v-select class="gps-input" ></v-select>
+                </v-col>
             </v-row>
             <v-row no-gutters >
                 <v-col cols="12" class="text-left mb-3 mt-n2">
@@ -58,7 +64,6 @@
                         class="gps-input"/>
                 </v-col>
             </v-row>
-            
             <v-row no-gutters class="row-container">
                 <v-col cols="4">Speed</v-col>
                 <v-col cols="8"> 
@@ -168,7 +173,6 @@
             </v-row>
         </v-card-text>
     </v-card>
-
 </template>
 
 <script setup>
@@ -196,6 +200,7 @@
           {value:7,info:'Manual'},
           {value:8,info:'Simulated'}]
     const selectFix = shallowRef({value:2,info:'2D-GPS fix'})
+    //const displaypanel = ref(props.viewControlPanel)
     const fix = [
         {value:1,info:'Fix not available'},
         {value:2,info:'2D-GPS fix'},
@@ -228,6 +233,9 @@
         if (val > 359) state.heading = 0
         if (val < 0) state.heading = 359
     })
+    /* watch(() => props.viewControlPanel, (val) => {
+        console.log("get panel:",val)
+    }) */
     const fixSignal = computed(() => {
   
         const signal = selectFix.value?.value
@@ -264,6 +272,10 @@
     })
     onMounted(() => {
         isElectron.value = !!window.electronAPI
+    })
+    const props = defineProps({
+        viewControlPanel: Object,
+        default: () => {}
     })
 </script>
 <style scoped>

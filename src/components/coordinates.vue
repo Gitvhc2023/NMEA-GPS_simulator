@@ -67,12 +67,12 @@ export default {
         get() {
         if (this.internalValue === null || this.internalValue === undefined) return "";
 
-        // 👇 SOLO lat/lon → 6 decimales
+        //lat/lon → 6 decimales
         if (this.step === 0.001) {
             return Number(this.internalValue).toFixed(6);
         }
 
-        // 👇 altitud u otros
+        //altitud u otros
         return this.internalValue;
         },
         set(val) {

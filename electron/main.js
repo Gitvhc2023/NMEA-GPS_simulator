@@ -10,12 +10,19 @@ const { initSerial,
 let mainWindow
 
 function createWindow() {
+    let normalBounds
     mainWindow = new BrowserWindow({
-        width: 1300,
-        height: 800,
+        width: 1000,
+        height: 700,
+        icon: path.join(__dirname, './assets/64x64.png'),
+        frame: false,        // ❌ quita barra nativa
+        resizable: true,
+        maximizable: false,
+        fullscreenable: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            contextIsolation: true
+            contextIsolation: true,
+            //icon: "./assets/64x64.png"
         }
     })
 
@@ -28,7 +35,8 @@ function createWindow() {
             return true
         }
         return false
-  })
+    })
+    
 }
 
 app.whenReady().then(() => {
@@ -46,18 +54,17 @@ ipcMain.handle('serial:list', async () => {
 })
 
 
-// 🔌 abrir
+// abrir
 ipcMain.handle('serial:open', (_, path) => {
-    console.log("abrir puerto:",path)
     openPort(path)
 })
 
-// 🔌 cerrar
+// cerrar
 ipcMain.handle('serial:close', () => {
     closePort()
 })
 
-// 📊 estado
+//estado
 ipcMain.handle('serial:status', () => {
     return getStatus()
 })
@@ -65,4 +72,11 @@ ipcMain.on("exit-app", (event,data) => {
   console.log('exit app>',data);
   app.quit();
   
+})
+ipcMain.on('window:minimize', () => {
+  BrowserWindow.getFocusedWindow().minimize()
+})
+
+ipcMain.on('window:close', () => {
+  BrowserWindow.getFocusedWindow().close()
 })

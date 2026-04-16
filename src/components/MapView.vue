@@ -5,10 +5,6 @@
             <Compass :heading="gpsState.heading" />
         </div>
     </v-card>
-    <!-- <v-divider></v-divider>
-    <div style="height: 25hv; position: relative; bottom: 0;left: 0;width: 100%;">
-      <NMEAConsole />
-    </div> -->
     
 </template>
 
@@ -129,7 +125,7 @@ watch(() => [gpsState.lat, gpsState.lon], () => {
 
 <style scoped>
 .map-card {
-  height: 75vh;
+  height: 65vh;
 }
 #map {
   height: 100%;

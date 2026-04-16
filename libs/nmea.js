@@ -1,14 +1,6 @@
 class NMEA {
     constructor() {}
 
-    satellites() {
-        return [
-            { prn: 1, elev: 45, az: 100, snr: 40 },
-            { prn: 3, elev: 30, az: 200, snr: 35 },
-            { prn: 5, elev: 60, az: 300, snr: 50 },
-            { prn: 7, elev: 20, az: 50, snr: 20 }
-        ];
-    }
     generateSatellites(state) {
         const count = state.satellites || 8;
         const prns = state.prns || [];

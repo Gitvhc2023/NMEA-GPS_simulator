@@ -14,8 +14,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSerialStatus: () => ipcRenderer.invoke('serial:status'),
 
     onSerialStatus: (callback) => {
-        ipcRenderer.on('serial:status', (_, status) => callback(status))
         ipcRenderer.on('serial:error', (_, status) => callback(status))
+        ipcRenderer.on('serial:status', (_, status) => callback(status))
     },
-    exitApp: () => ipcRenderer.invoke('exit-app'),
+    minimize: () => ipcRenderer.send('window:minimize'),
+    close: () => ipcRenderer.send('window:close')
 })

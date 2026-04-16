@@ -309,9 +309,10 @@ class PARSE_NMEA {
         lon:getlon(gga[4], gga[5]),
         alt:parseDist(gga[9], gga[10]),
         quality:GGAFix(gga[6]),
+        fix:parseNumber(gga[6]),
         // confluence:confluence(getlan(gga[2], gga[3]),getlon(gga[4], gga[5])),
         value:gga[6],
-        satellites_view: parseNumber(gga[7]),
+        satellites: parseNumber(gga[7]),
         dilution: parseNumber(gga[8]), // dilution
         geoidal: parseDist(gga[11], gga[12]), // aboveGeoid
         age: gga[13] === undefined ? null : parseNumber(gga[13]), // dgps time since update
@@ -337,10 +338,13 @@ class PARSE_NMEA {
         }
       }
       return {
-        mode: GSAMode(gsa[1]),
-        fix: GSAFix(gsa[2]),
+        modeState: GSAMode(gsa[1]),
+        mode: gsa[1],
+        fixType: parseNumber(gsa[2]),
+        fixState:GSAFix(gsa[2]),
         value:gsa[2],
-        satellites_used: sats,      //PRNs of satellites used for fix (space for 12)
+        seenSatellites: sats, 
+        prns:sats,     //PRNs of satellites used for fix (space for 12)
         pdop: parseNumber(gsa[15]),
         hdop: parseNumber(gsa[16]),
         vdop: parseNumber(gsa[17].slice(0,4)),
@@ -432,10 +436,6 @@ class PARSE_NMEA {
         //return Object.assign(this,nmea);
 
     }
-    /* isData(state) {
-      //console.log("raw data",state)
-      return {plot:this.rawData(state)}
-    } */
 
 }
 //module.exports= PARSE_NMEA

@@ -2,7 +2,7 @@
     <div class="console-log" v-if="gpsState.log">
         <pre>{{ logs }}</pre>
     </div>
-    <div v-if="!gpsState.log">
+    <div class="signal-strength" v-if="!gpsState.log">
         <signalStrength1 :satellites="gpsState.seenSatellites" />
     </div>
 </template>
@@ -15,6 +15,7 @@
 
     const logs = ref('')
     let logInterval = null
+    const isElectron = ref(false)
     function createLog(){
         const dataFrame = generateFrames(gpsState)
         logs.value = Object.values(dataFrame).join('\n')
@@ -46,6 +47,9 @@
                 const data = generateFrames(gpsState)
                 gpsState.seenSatellites = parseGSV(data?.gsv)
                 logs.value = Object.values(data).join('\n')
+                if(isElectron) {
+                    window.electronAPI?.sendNMEA(logs.value)
+                } 
             }, 1000)
 
         }else{
@@ -56,17 +60,29 @@
     })
     onMounted(() => {
         createLog()
+        isElectron.value = !!window.electronAPI
     })
     
 </script>
 <style >
 .console-log {
-  max-height: 150px;
+  max-height: 100vh;
+  height: 150px;
+  
   overflow-y: auto;
   background: black;
   color: lime;
-  padding: 10px;
+  padding: 5px;
   text-align: left;
-  font-size: 0.80rem
+  font-size: 0.80rem;
+ 
+}
+.signal-strength {
+   /*  max-height: 170px; */
+    /* height: 210px; */
+    /* background: black; */
+    padding: 5px;
+   
+ 
 }
 </style>
